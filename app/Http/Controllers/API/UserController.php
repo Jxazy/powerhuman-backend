@@ -90,7 +90,7 @@ class UserController extends Controller
                 'message' => 'Something went wrong',
                 'error' => $th
             ], 'Authentication Failed', 500);
-            
-        }
+
+        } 
     }
 }
