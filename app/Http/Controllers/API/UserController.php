@@ -27,14 +27,12 @@ class UserController extends Controller
             // Find user by email
             $credentials = request(['email', 'password']);
             if (!Auth::attempt($credentials)) {
-                return ResponseFormatter::error([
-                    'message' => 'Unauthorized'
-                ], 'Authentication Failed', 500);
+                return ResponseFormatter::error('Authentication Failed', 500);
             }
 
             $user = User::where('email', $request->email)->first();
-            if (!Hash::check($request->password, $user->password, [])) {
-                throw new Exception('Invalid Credentials');
+            if (!Hash::check($request->password, $user->password)) {
+                throw new Exception('Invalid Password');
             }
 
             // Generate token
@@ -47,11 +45,8 @@ class UserController extends Controller
                 'user' => $user
             ], 'Authenticated');
 
-        } catch (Exception $th) {
-            return ResponseFormatter::error([
-                'message' => 'Something went wrong',
-                'error' => $th
-            ], 'Authentication Failed', 500);
+        } catch (Exception $error) {
+            return ResponseFormatter::error('Authentication Failed');
         }
     }
 
@@ -83,14 +78,29 @@ class UserController extends Controller
                 'user' => $user
             ], 'Register success');
 
-        } catch (Exception $th) {
+        } catch (Exception $error) {
 
             // Return error response
-            return ResponseFormatter::error([
-                'message' => 'Something went wrong',
-                'error' => $th
-            ], 'Authentication Failed', 500);
+            return ResponseFormatter::error($error->getMessage());
 
         } 
+    }
+
+    public function logout(Request $request) 
+    {
+        // Revoke Token
+        $token = $request->user()->currentAccessToken()->delete();
+
+        // Response Formatter
+        return ResponseFormatter::success($token, 'Token Revoked');
+    }
+
+    public function fetch(Request $request) 
+    {
+        // Get User
+        $user = $request->user();
+
+        // Return Response
+        return ResponseFormatter::success($user, 'fetch success');
     }
 }
