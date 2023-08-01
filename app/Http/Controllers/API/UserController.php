@@ -92,7 +92,7 @@ class UserController extends Controller
         $token = $request->user()->currentAccessToken()->delete();
 
         // Response Formatter
-        return ResponseFormatter::success($token, 'Token Revoked');
+        return ResponseFormatter::success($token, 'Logout Success');
     }
 
     public function fetch(Request $request) 
